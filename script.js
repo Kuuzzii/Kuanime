@@ -1,93 +1,303 @@
-// Elements
-const newReleasedContainer = document.getElementById("newReleasedContainer");
-const spotlightTitle = document.getElementById("spotlight-title");
-const spotlightDescription = document.getElementById("spotlight-description");
-const watchNowBtn = document.getElementById("watchNowBtn");
-const searchBar = document.getElementById("searchBar");
-const searchBtn = document.getElementById("searchBtn");
+const API_KEY = 'b139bc417606842811f1526ae92572bc';
 
-// Spotlight anime data (example hardcoded, you can extend to dynamic)
-const spotlightAnime = {
-  title: "Fullmetal Alchemist: Brotherhood",
-  imdb: 9.1,
-  releaseYear: 2009,
-  description:
-    "Two brothers search for a Philosopher's Stone after an attempt to revive their deceased mother goes wrong and leaves them in damaged physical forms.",
-  MALid: 5114,
-  episode: 1,
-  subOrDub: "sub",
-};
+const BASE_URL = 'https://api.themoviedb.org/3';
 
-// Generate vidlink URL with optional fallback
-function generateVidlinkUrl(MALid, episode = 1, subOrDub = "sub", fallback = false) {
-  let url = `https://vidlink.pro/anime/${MALid}/${episode}/${subOrDub}`;
-  if (fallback) url += "?fallback=true";
-  return url;
-}
+const IMG_URL = 'https://image.tmdb.org/t/p/original';
 
-// Load the spotlight section
-function loadSpotlight() {
-  spotlightTitle.textContent = spotlightAnime.title;
-  spotlightDescription.textContent = spotlightAnime.description + ` (Release Year: ${spotlightAnime.releaseYear})`;
-  watchNowBtn.onclick = () => {
-    const url = generateVidlinkUrl(
-      spotlightAnime.MALid,
-      spotlightAnime.episode,
-      spotlightAnime.subOrDub
-    );
-    window.open(url, "_blank");
-  };
-}
+const urlParams = new URLSearchParams(window.location.search);
 
-// Fetch latest seasonal anime using Jikan API and display them
-async function fetchNewReleased() {
+const movieId = urlParams.get('id');
+
+const type = urlParams.get('type'); // 'movie' or 'tv'
+
+const season = urlParams.get('season') || 1;
+
+const episode = urlParams.get('episode') || 1;
+
+const backdrop = document.getElementById('movie-backdrop');
+
+const poster = document.getElementById('movie-poster');
+
+const titleEl = document.getElementById('movie-title');
+
+const releaseDateEl = document.getElementById('movie-release-date');
+
+const runtimeEl = document.getElementById('movie-runtime');
+
+const genresEl = document.getElementById('movie-genres');
+
+const overviewEl = document.getElementById('movie-overview');
+
+const videoIframe = document.getElementById('movie-video');
+
+const playBtn = document.getElementById('play-btn');
+
+const serverSelect = document.getElementById('server-select');
+
+const backBtn = document.getElementById('back-btn');
+
+let currentServerIndex = null;
+
+const servers = [];
+
+let imdbId = null;
+
+// Fetch IMDb id for TV shows or use movieId as IMDb for movies
+
+async function getImdbId(tmdbId, type) {
+
+  if (!tmdbId || !type) return null;
+
   try {
-    // Fetch anime from the current season
-    const response = await fetch("https://api.jikan.moe/v4/seasons/now");
-    const data = await response.json();
 
-    if (!data.data || !data.data.length) {
-      newReleasedContainer.innerHTML = "<p>No new releases found.</p>";
-      return;
+    const url = ${BASE_URL}/${type}/${tmdbId}?api_key=${API_KEY}&append_to_response=external_ids;
+
+    const res = await fetch(url);
+
+    if (!res.ok) throw new Error('Failed to fetch external IDs');
+
+    const data = await res.json();
+
+    if (data.external_ids && data.external_ids.imdb_id) {
+
+      return data.external_ids.imdb_id;
+
     }
 
-    newReleasedContainer.innerHTML = "";
+    return null;
 
-    // Show up to 6 new releases
-    data.data.slice(0, 6).forEach((anime) => {
-      const malId = anime.mal_id;
-      const title = anime.title;
-      // Use jpg image url, fallback if not found
-      const image = anime.images?.jpg?.image_url || "";
-      const episode = 1; // Default to episode 1 for new releases
-      const subOrDub = "sub"; // Default sub, you can extend with UI toggle
+  } catch (err) {
 
-      const animeDiv = document.createElement("div");
-      animeDiv.classList.add("anime-item");
-      animeDiv.title = title;
-      animeDiv.innerHTML = `
-        <img src="${image}" alt="${title}" />
-        <div class="anime-title">${title}</div>
-        <button>Watch Ep ${episode} (Sub)</button>
-      `;
+    console.error(err);
 
-      animeDiv.querySelector("button").onclick = () => {
-        const url = generateVidlinkUrl(malId, episode, subOrDub);
-        window.open(url, "_blank");
-      };
+    return null;
 
-      newReleasedContainer.appendChild(animeDiv);
-    });
-  } catch (error) {
-    newReleasedContainer.innerHTML = `<p>Error loading new releases: ${error.message}</p>`;
   }
+
 }
 
-// Optional Search handler
-searchBtn.onclick = () => {
-  alert(`Search for: ${searchBar.value} (Search functionality not implemented)`);
-};
+async function fetchDetails() {
 
-// Initialize page
-loadSpotlight();
-fetchNewReleased();
+  try {
+
+    const res = await fetch(`${BASE_URL}/${type}/${movieId}?api_key=${API_KEY}`);
+
+    if (!res.ok) throw new Error('Failed to fetch details');
+
+    const data = await res.json();
+
+    backdrop.style.backgroundImage = url(${IMG_URL}${data.backdrop_path || ''});
+
+    poster.src = ${IMG_URL}${data.poster_path || ''};
+
+    titleEl.textContent = data.title || data.name || '';
+
+    overviewEl.textContent = data.overview || 'No description available.';
+
+    releaseDateEl.textContent = new Date(data.release_date || data.first_air_date || '').toLocaleDateString();
+
+    if (type === 'movie') {
+
+      runtimeEl.textContent = data.runtime ? ${data.runtime} min : '';
+
+    } else {
+
+      runtimeEl.textContent = (data.episode_run_time && data.episode_run_time.length > 0) ? ${data.episode_run_time[0]} min per episode : '';
+
+    }
+
+    genresEl.innerHTML = '';
+
+    if (data.genres) {
+
+      data.genres.forEach(genre => {
+
+        const span = document.createElement('span');
+
+        span.className = 'genre-tag';
+
+        span.textContent = genre.name;
+
+        genresEl.appendChild(span);
+
+      });
+
+    }
+
+  } catch (err) {
+
+    console.error(err);
+
+    alert('Failed to load movie/show details.');
+
+  }
+
+}
+
+// Setup servers array with correct IMDb/TMDb IDs
+
+async function setupServers() {
+
+  imdbId = type === 'tv' ? await getImdbId(movieId, 'tv') : movieId;
+
+  // Clear servers array
+
+  servers.length = 0;
+
+  if (type === 'movie') {
+
+    // For movies assume movieId is IMDb id
+
+    servers.push(
+
+      { name: 'Vidsrc', url: https://vidsrc.me/embed/${movieId} },
+
+      { name: 'Fsapi', url: https://fsapi.xyz/movie/${movieId} },
+
+      { name: 'Curtstream', url: https://curtstream.com/movies/imdb/${movieId} },
+
+      { name: 'Moviewp', url: https://moviewp.com/se.php?video_id=${movieId} },
+
+      { name: 'ApiMDB', url: https://v2.apimdb.net/e/movie/${movieId} },
+
+      { name: 'Gomo', url: https://gomo.to/movie/${movieId} },
+
+      { name: 'VidCloud', url: https://vidcloud.stream/${movieId}.html },
+
+    );
+
+  } else if (type === 'tv') {
+
+    if (!imdbId) {
+
+      alert('IMDb ID not found for TV show. Some streams may not work.');
+
+    }
+
+    servers.push(
+
+      { name: 'Vidsrc', url: https://vidsrc.me/embed/${movieId} },
+
+      { name: 'Fsapi', url: https://fsapi.xyz/movie/${movieId} },
+
+      { name: 'Fsapi TV', url: https://fsapi.xyz/tv-imdb/${imdbId || movieId}-${season}-${episode} },  // IMDb id preferred
+
+      { name: 'Moviewp TV', url: https://moviewp.com/se.php?video_id=${movieId}&tmdb=1&s=${season}&e=${episode} }, // TMDb id
+
+      { name: 'ApiMDB TV', url: https://v2.apimdb.net/e/tmdb/tv/${movieId}/${season}/${episode}/ }, // TMDb id
+
+      { name: 'GDrivePlayer', url: https://databasegdriveplayer.co/player.php?type=series&tmdb=${movieId}&season=${season}&episode=${episode} }, // TMDb id
+
+      { name: 'Curtstream TV', url: https://curtstream.com/series/tmdb/${movieId}/season/${season}/episode/${episode}/ }, // TMDb id
+
+    );
+
+  }
+
+  // Populate serverSelect dropdown
+
+  serverSelect.innerHTML = '';
+
+  servers.forEach((srv, idx) => {
+
+    const option = document.createElement('option');
+
+    option.value = idx;
+
+    option.textContent = srv.name;
+
+    serverSelect.appendChild(option);
+
+  });
+
+  currentServerIndex = null;
+
+  updateVideoSrc();
+
+}
+
+function updateVideoSrc() {
+
+  const existingMsg = document.getElementById('choose-server-msg');
+
+  if (existingMsg) existingMsg.remove();
+
+  if (currentServerIndex === null) {
+
+    videoIframe.src = 'about:blank';
+
+    const msg = document.createElement('div');
+
+    msg.id = 'choose-server-msg';
+
+    msg.style =
+
+      'position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#fff;background-color:rgba(0,0,0,0.75);font-size:1.4rem;z-index:10;';
+
+    msg.textContent = '⚠️ Please choose a server first';
+
+    const container = document.querySelector('.video-container');
+
+    container.style.position = 'relative';
+
+    container.appendChild(msg);
+
+    playBtn.disabled = true;
+
+    return;
+
+  }
+
+  playBtn.disabled = false;
+
+  videoIframe.src = servers[currentServerIndex].url;
+
+}
+
+// Event listeners
+
+serverSelect.addEventListener('change', (e) => {
+
+  currentServerIndex = parseInt(e.target.value, 10);
+
+  updateVideoSrc();
+
+});
+
+playBtn.addEventListener('click', () => {
+
+  if (currentServerIndex === null) {
+
+    alert('Please choose a streaming server first.');
+
+    return;
+
+  }
+
+  document.querySelector('.video-container').scrollIntoView({ behavior: 'smooth' });
+
+});
+
+backBtn.addEventListener('click', () => {
+
+  window.history.back();
+
+});
+
+if (!movieId || !type) {
+
+  alert('Invalid movie or TV show ID');
+
+  playBtn.disabled = true;
+
+} else {
+
+  fetchDetails();
+
+  setupServers();
+
+  updateVideoSrc();
+
+}
+
+put it here and give me the fully updated code
