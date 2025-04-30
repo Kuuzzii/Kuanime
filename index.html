@@ -3,92 +3,50 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Watch2Day UI - Anime Player</title>
+  <title>KuAnime</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <header>
+    <div class="logo">KuAnime</div>
+    <nav>
+      <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Anime</a></li>
+        <li><a href="https://facebook.com" target="_blank" rel="noopener noreferrer">Facebook</a></li>
+        <li><a href="#">Telegram</a></li>
+        <li><a href="#">Read Me</a></li>
+      </ul>
+    </nav>
+    <div class="search-container">
+      <input type="text" id="searchBar" placeholder="search anime..." />
+      <button id="searchBtn">Search</button>
+    </div>
+  </header>
 
-<nav>
-  <div class="logo"><span>2</span>WATCH2DAY</div>
-  <ul>
-    <li>
-      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-      <a href="#">Home</a>
-    </li>
-    <li>
-      <svg viewBox="0 0 24 24"><path d="M18 4l2 5h-3.17l-2-5H18zm-7 7H4l5-8h2v8zM4 17h10v2H4z"/></svg>      
-      <a href="#">Movies</a>
-    </li>
-    <li>
-      <svg viewBox="0 0 24 24"><path d="M21 3H3v2h1v10h14V5h2V3z"/></svg>
-      <a href="#">TV Shows</a>
-    </li>
-    <li>
-      <svg viewBox="0 0 24 24"><path d="M12 4l-1 4h2l-1-4zm-2 6h4v2h-4z"/></svg>
-      <a href="#">Animation</a>
-    </li>
-    <li>
-      <svg viewBox="0 0 24 24"><path d="M9 11 12 8l3 3v6h-6v-6z"/></svg>
-      <a href="#">Telegram</a>
-    </li>
-    <li>
-      <svg viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="10" stroke-width="2" stroke="currentColor" fill="none"/>
-        <line x1="12" y1="8" x2="12" y2="12" stroke-width="2" stroke="currentColor"/>
-        <circle cx="12" cy="16" r="1" fill="currentColor"/>
-      </svg>
-      <a href="#">Read Me</a>
-    </li>
-  </ul>
-  <div class="search-container">
-    <input type="search" placeholder="Search for movies and series..." />
-  </div>
-</nav>
+  <main>
+    <section class="spotlight">
+      <h1 id="spotlight-title">Spotlight Title</h1>
+      <p><span class="imdb-rating">⭐ IMDb: 8.5</span> Release Date: 2024</p>
+      <p id="spotlight-description">
+        This is the description of the spotlight anime. It highlights the most exciting features or storyline.
+      </p>
+      <button id="watchNowBtn">Watch Now</button>
+    </section>
 
-<section class="spotlight" role="region" aria-label="Spotlight Movie or Series">
-  <div class="spotlight-episode-count" aria-label="Number of episodes"></div>
-  <h1 id="spotlight-title">Spotlight Title</h1>
-  <div class="rating">&#11088; <span class="imdb" id="spotlight-rating">IMDb: 8.5</span> <span id="spotlight-release">Release Date: 2024</span></div>
-  <p id="spotlight-description">
-    This is the description of the spotlight movie or series. It highlights the most exciting features or storyline.
-  </p>
-  <button class="watch-btn" type="button" id="prev-ep-btn" disabled>Prev Episode</button>
-  <button class="watch-btn" type="button" id="next-ep-btn" disabled>Next Episode</button>
+    <section class="new-released">
+      <h2>New Released</h2>
+      <div id="newReleasedContainer" class="anime-list">
+        <!-- dynamically filled -->
+      </div>
+    </section>
+  </main>
 
-  <div class="video-container" aria-label="Anime player">
-    <iframe
-      id="anime-player"
-      src=""
-      frameborder="0"
-      allowfullscreen
-      allow="autoplay; fullscreen"
-      title="Anime Player"
-      width="100%"
-      height="480"
-      style="border-radius: 12px; margin-top: 20px;"
-    ></iframe>
-  </div>
-</section>
+  <footer>
+    <p>⚠️ DISCLAIMER! This website's server has no files on it. Only content from third-party websites and services is displayed on this website. We have no control over or endorsement of any of the products, services, or material provided by these websites.</p>
+    <p>Copyright © KuAnime 2024. All Rights Reserved.</p>
+  </footer>
 
-<div class="sections-container" role="main">
-  <h2 class="section-heading" tabindex="0">New Released Anime</h2>
-
-  <!-- New released anime list -->
-  <div id="new-anime-list" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 15px;"></div>
-</div>
-
-<div class="disclaimer" role="alert" aria-live="polite">
-  ⚠️ <strong>DISCLAIMER!</strong> This website's server has no files on it. Only content from third-party websites and services is displayed on this website. We have no control over or endorsement of any of the products, services, or material provided by these websites.
-</div>
-
-<footer>
-  Copyright © Watch2Day 2024. All Rights Reserved.
-</footer>
-
-<div class="dark-mode-toggle" role="button" aria-pressed="false" tabindex="0" aria-label="Toggle dark mode">
-  <span>☀️</span> DARK MODE
-</div>
-
-<script src="script.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
