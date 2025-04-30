@@ -1,56 +1,173 @@
-/* Spotlight episode count badge: small rounded, top-left inside spotlight */
-.spotlight {
-  position: relative;
-  background: linear-gradient(135deg, #bebebe, #8c8c8c);
-  padding: 60px 30px 20px 30px;
-  border-radius: 0 0 20px 20px;
-  max-width: 900px;
-  margin: 20px auto 50px;
-  box-shadow: inset 0 0 50px #00000050;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: linear-gradient(to bottom, #c0c0c0, #808080);
+  color: white;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-}
-.spotlight-episode-count {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  background-color: rgba(215,0,0,0.85);
-  color: white;
-  font-weight: 700;
-  font-size: 13px;
-  padding: 4px 8px;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.7);
-  user-select: none;
-  pointer-events: none;
-  z-index: 10;
 }
 
-/* Buttons in spotlight */
-.spotlight .watch-btn {
-  background-color: #d70000;
+header {
+  background: #111;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 24px;
+  color: red;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+nav ul li a {
   color: white;
-  padding: 10px 18px;
-  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+nav ul li a:hover {
+  color: red;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+#searchBar {
+  padding: 5px 10px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  width: 180px;
+}
+
+#searchBtn {
+  background-color: red;
   border: none;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 14px;
-  margin-right: 10px;
-  margin-top: 10px;
-}
-.spotlight .watch-btn:disabled {
-  background: #aaa;
-  cursor: not-allowed;
-}
-
-/* Video container */
-.video-container {
-  width: 100%;
-  margin-top: 20px;
+  padding: 6px 12px;
+  color: white;
   border-radius: 12px;
-  overflow: hidden;
+  cursor: pointer;
+  font-weight: bold;
 }
 
-/* ... Keep your existing styles for other parts ... */
+main {
+  flex: 1;
+  padding: 20px;
+}
+
+.spotlight {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 20px 20px 0 0;
+  padding: 30px;
+  margin-bottom: 40px;
+}
+
+.spotlight h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.imdb-rating {
+  color: gold;
+  font-weight: bold;
+}
+
+.spotlight p {
+  margin-top: 10px;
+  font-size: 1rem;
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+#watchNowBtn {
+  margin-top: 20px;
+  background-color: red;
+  border: none;
+  padding: 10px 18px;
+  color: white;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.new-released {
+  text-align: center;
+}
+
+.new-released h2 {
+  font-size: 1.75rem;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 1px #333;
+  border-bottom: 2px solid red;
+  display: inline-block;
+  padding-bottom: 5px;
+}
+
+.anime-list {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.anime-item {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  width: 180px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  text-align: center;
+  padding: 15px;
+}
+
+.anime-item:hover {
+  transform: scale(1.05);
+}
+
+.anime-item img {
+  width: 100%;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.anime-title {
+  font-weight: 600;
+  font-size: 1rem;
+  min-height: 48px;
+  color: white;
+}
+
+footer {
+  background: rgba(255, 255, 255, 0.1);
+  text-align: center;
+  font-size: 0.85rem;
+  padding: 15px 20px;
+  color: white;
+  margin-top: auto;
+  user-select: none;
+}
+
+footer p:first-child {
+  margin-bottom: 10px;
+}
