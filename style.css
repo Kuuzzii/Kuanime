@@ -58,6 +58,7 @@ nav ul li a:hover {
   border-radius: 12px;
   border: 1px solid #ccc;
   width: 180px;
+  font-size: 14px;
 }
 
 #searchBtn {
@@ -68,6 +69,7 @@ nav ul li a:hover {
   border-radius: 12px;
   cursor: pointer;
   font-weight: bold;
+  font-size: 14px;
 }
 
 main {
@@ -156,6 +158,18 @@ main {
   font-size: 1rem;
   min-height: 48px;
   color: white;
+  margin-bottom: 8px;
+}
+
+.anime-item button {
+  background-color: red;
+  border: none;
+  padding: 6px 12px;
+  color: white;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
 }
 
 footer {
