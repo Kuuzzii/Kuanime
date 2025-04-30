@@ -1,7 +1,3 @@
-const MAL_ID_DEFAULT = 5114; // Example MAL ID for "Fullmetal Alchemist: Brotherhood"
-const EPISODE_NUMBER_DEFAULT = 1;
-const SUB_OR_DUB_DEFAULT = "sub";
-
 // Elements
 const newReleasedContainer = document.getElementById("newReleasedContainer");
 const spotlightTitle = document.getElementById("spotlight-title");
@@ -10,7 +6,7 @@ const watchNowBtn = document.getElementById("watchNowBtn");
 const searchBar = document.getElementById("searchBar");
 const searchBtn = document.getElementById("searchBtn");
 
-// Example spotlight anime data (hardcoded for now)
+// Spotlight anime data (example hardcoded, you can extend to dynamic)
 const spotlightAnime = {
   title: "Fullmetal Alchemist: Brotherhood",
   imdb: 9.1,
@@ -22,42 +18,14 @@ const spotlightAnime = {
   subOrDub: "sub",
 };
 
-// Sample new released anime data: should be replaced with real API call
-let newReleases = [
-  {
-    title: "Chainsaw Man",
-    MALid: 44589,
-    episode: 1,
-    subOrDub: "sub",
-    image:
-      "https://cdn.myanimelist.net/images/anime/1987/136900.jpg",
-  },
-  {
-    title: "Spy x Family",
-    MALid: 50265,
-    episode: 1,
-    subOrDub: "sub",
-    image:
-      "https://cdn.myanimelist.net/images/anime/1476/109222.jpg",
-  },
-  {
-    title: "Jujutsu Kaisen",
-    MALid: 40748,
-    episode: 1,
-    subOrDub: "sub",
-    image:
-      "https://cdn.myanimelist.net/images/anime/1171/109222.jpg",
-  },
-];
-
-// Helper to generate vidlink API url
-function generateVidlinkUrl(MALid, episode, subOrDub, fallback = false) {
-  let base = `https://vidlink.pro/anime/${MALid}/${episode}/${subOrDub}`;
-  if (fallback) base += "?fallback=true";
-  return base;
+// Generate vidlink URL with optional fallback
+function generateVidlinkUrl(MALid, episode = 1, subOrDub = "sub", fallback = false) {
+  let url = `https://vidlink.pro/anime/${MALid}/${episode}/${subOrDub}`;
+  if (fallback) url += "?fallback=true";
+  return url;
 }
 
-// Populate spotlight section
+// Load the spotlight section
 function loadSpotlight() {
   spotlightTitle.textContent = spotlightAnime.title;
   spotlightDescription.textContent = spotlightAnime.description + ` (Release Year: ${spotlightAnime.releaseYear})`;
@@ -71,39 +39,55 @@ function loadSpotlight() {
   };
 }
 
-// Populate new releases section dynamically
-function loadNewReleased() {
-  newReleasedContainer.innerHTML = "";
-  newReleases.forEach((anime) => {
-    const animeDiv = document.createElement("div");
-    animeDiv.classList.add("anime-item");
-    animeDiv.title = anime.title;
+// Fetch latest seasonal anime using Jikan API and display them
+async function fetchNewReleased() {
+  try {
+    // Fetch anime from the current season
+    const response = await fetch("https://api.jikan.moe/v4/seasons/now");
+    const data = await response.json();
 
-    animeDiv.innerHTML = `
-      <img src="${anime.image}" alt="${anime.title}" />
-      <div class="anime-title">${anime.title}</div>
-      <button>Watch Ep ${anime.episode} (Sub)</button>
-    `;
+    if (!data.data || !data.data.length) {
+      newReleasedContainer.innerHTML = "<p>No new releases found.</p>";
+      return;
+    }
 
-    animeDiv.querySelector("button").onclick = () => {
-      const url = generateVidlinkUrl(anime.MALid, anime.episode, anime.subOrDub);
-      window.open(url, "_blank");
-    };
+    newReleasedContainer.innerHTML = "";
 
-    newReleasedContainer.appendChild(animeDiv);
-  });
+    // Show up to 6 new releases
+    data.data.slice(0, 6).forEach((anime) => {
+      const malId = anime.mal_id;
+      const title = anime.title;
+      // Use jpg image url, fallback if not found
+      const image = anime.images?.jpg?.image_url || "";
+      const episode = 1; // Default to episode 1 for new releases
+      const subOrDub = "sub"; // Default sub, you can extend with UI toggle
+
+      const animeDiv = document.createElement("div");
+      animeDiv.classList.add("anime-item");
+      animeDiv.title = title;
+      animeDiv.innerHTML = `
+        <img src="${image}" alt="${title}" />
+        <div class="anime-title">${title}</div>
+        <button>Watch Ep ${episode} (Sub)</button>
+      `;
+
+      animeDiv.querySelector("button").onclick = () => {
+        const url = generateVidlinkUrl(malId, episode, subOrDub);
+        window.open(url, "_blank");
+      };
+
+      newReleasedContainer.appendChild(animeDiv);
+    });
+  } catch (error) {
+    newReleasedContainer.innerHTML = `<p>Error loading new releases: ${error.message}</p>`;
+  }
 }
 
-// Search functionality (for demonstration only)
+// Optional Search handler
 searchBtn.onclick = () => {
-  // For your actual app, integrate a real search API for anime here
-  alert(`Search for: ${searchBar.value} (Functionality not implemented)`);
+  alert(`Search for: ${searchBar.value} (Search functionality not implemented)`);
 };
 
-// Initial load
+// Initialize page
 loadSpotlight();
-loadNewReleased();
-
-// Here you should add real networking code to fetch new releases and spotlight anime dynamically as they update.
-// For example, from your own backend or a third-party MAL API wrapper.
-// This demo uses hardcoded data as placeholders.
+fetchNewReleased();
